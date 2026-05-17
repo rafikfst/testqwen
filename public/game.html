@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu - Avène Game Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    
+    <style>
+        .game-arena {
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+        
+        .question-card {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .zone-container {
+            background: var(--surface-white);
+            border-radius: var(--radius-standard);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .zone-title {
+            font-size: 1.25rem;
+            color: var(--avene-salmon);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            min-height: 80px;
+            padding: 1rem;
+        }
+        
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--aqua-thermal), #B8E4ED);
+            color: var(--deep-slate);
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-soft);
+            user-select: none;
+        }
+        
+        .chip:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .answer-zone .chip {
+            background: linear-gradient(135deg, var(--avene-salmon), #F09A80);
+            color: white;
+        }
+        
+        .validate-btn {
+            width: 100%;
+            max-width: 300px;
+            margin: 2rem auto;
+            display: block;
+        }
+        
+        .niveau-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;
+            text-align: center;
+            color: var(--deep-slate);
+            line-height: 1.6;
+            padding: 2rem;
+            background: var(--pristine-white);
+            border-radius: var(--radius-standard);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        @media (max-width: 768px) {
+            .chip {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .zone-container {
+                padding: 1.5rem;
+            }
+            
+            .question-text {
+                font-size: 1.25rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar no-print">
+        <div class="container flex-between">
+            <div class="navbar-brand">🌊 Avène Game</div>
+            <div class="navbar-menu">
+                <a href="/" class="navbar-link">Accueil</a>
+                <a href="/game.html" class="navbar-link">Jeu</a>
+                <a href="/reporting.html" class="navbar-link">Rapports</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Game Arena -->
+    <main class="game-arena">
+        <div class="container" id="game-container">
+            <!-- Niveau Indicator -->
+            <div id="niveau-indicator" class="niveau-display"></div>
+            
+            <!-- Question Card -->
+            <div class="question-card card fade-in">
+                <div id="question-text" class="question-text">
+                    Chargement de la question...
+                </div>
+            </div>
+            
+            <!-- Pool Zone -->
+            <div class="zone-container fade-in-delayed">
+                <h3 class="zone-title">📚 Mots Disponibles</h3>
+                <div id="pool-zone" class="chip-container"></div>
+            </div>
+            
+            <!-- Answer Zone -->
+            <div class="zone-container fade-in-delayed">
+                <h3 class="zone-title">✅ Votre Réponse</h3>
+                <div id="answer-zone" class="chip-container answer-zone"></div>
+            </div>
+            
+            <!-- Validate Button -->
+            <button id="validate-btn" class="btn btn-primary validate-btn button-pulse">
+                Valider ma réponse
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title"></h2>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+            <div id="modal-footer" class="modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- Success Bubble Container -->
+    <div id="bubble-container" class="success-bubble-container"></div>
+
+    <!-- Scripts -->
+    <script src="/js/game.js"></script>
+    <script>
+        // Initialize game with demo parameters
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new AveneGameEngine({
+                apiBaseUrl: '/api',
+                supabaseUrl: 'https://pyqjgffygesrlfyfagms.supabase.co',
+                supabaseKey: 'sb_publishable_vltwOvN6j1ThYSos43EV9A_z7la0IFh'
+            });
+            
+            // Demo mode - using default values
+            // In production, these would come from URL params or session
+            game.init(1, 1, 1).catch(err => {
+                console.error('Failed to initialize game:', err);
+            });
+        });
+    </script>
+</body>
+</html>
