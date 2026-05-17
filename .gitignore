@@ -5,75 +5,17 @@ node_modules/
 # Environment variables
 .env
 
-# Build artifacts
-dist/
-build/
-*.js.map
-*.d.ts
-*.d.ts.map
-*.cjs
-*.cjs.map
-*.mjs
-*.mjs.map
-*.cts
-*.cts.map
-*.mts
-*.mts.map
-
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
 # Logs
 *.log
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# Build artifacts (from the long list of node_modules files)
+dist/
+build/
+target/
 
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Package lock files
+# Package lock file
 package-lock.json
 
-# Runtime data
-.pnpm-store/
-.yarn/
-yarn.lock
-
-# Compiled Python files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Distribution / packaging
-.Python
-env/
-venv/
-.venv/
-.ENV
-.venv.bak/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Testing
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# System files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Database schema (since it's generated/modified by the system)
+schema.sql
 ```
