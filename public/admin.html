@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Avène Game Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    
+    <style>
+        .admin-panel {
+            display: none;
+        }
+        
+        .admin-panel.active {
+            display: block;
+        }
+        
+        .crud-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .form-modal {
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar no-print">
+        <div class="container flex-between">
+            <div class="navbar-brand">🌊 Avène Game Admin</div>
+            <div class="navbar-menu">
+                <a href="/" class="navbar-link">Accueil</a>
+                <a href="/game.html" class="navbar-link">Jeu</a>
+                <a href="/reporting.html" class="navbar-link">Rapports</a>
+                <button id="logout-btn" class="btn btn-outline">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="section">
+        <div class="container">
+            <div class="auth-container card">
+                <h2 class="text-center mb-4">Connexion Administration</h2>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-input" required placeholder="admin@avene.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" id="login-password" class="form-input" required placeholder="••••••••">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                </form>
+                
+                <div id="login-error" class="alert alert-error mt-3 hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel section">
+        <div class="container">
+            <h1 class="mb-4">🛠️ Panneau d'Administration</h1>
+            
+            <!-- Navigation Tabs -->
+            <div class="admin-nav">
+                <button class="btn btn-outline" data-tab="users">👥 Utilisateurs</button>
+                <button class="btn btn-outline" data-tab="tournees">📍 Tournées</button>
+                <button class="btn btn-outline" data-tab="pharmacies">🏪 Pharmacies</button>
+                <button class="btn btn-outline" data-tab="agents">👨‍⚕️ Agents</button>
+                <button class="btn btn-outline" data-tab="questions">❓ Questions</button>
+                <button class="btn btn-outline" data-tab="bilans">📊 Bilans</button>
+                <button class="btn btn-primary" id="create-new-btn">+ Nouveau</button>
+            </div>
+            
+            <!-- Content Area -->
+            <div id="admin-content" class="card">
+                <div class="text-center">
+                    <div class="spinner"></div>
+                    <p class="mt-2 text-muted">Chargement...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div id="form-modal" class="modal-overlay">
+        <div class="modal-content form-modal">
+            <div class="modal-header">
+                <h2 id="form-title" class="modal-title"></h2>
+            </div>
+            <div id="form-body" class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="document.getElementById('form-modal').classList.remove('active')">Annuler</button>
+                <button id="form-submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        class AdminDashboard {
+            constructor() {
+                this.currentTab = 'users';
+                this.token = localStorage.getItem('adminToken');
+                this.init();
+            }
+            
+            async init() {
+                if (this.token) {
+                    this.showAdminPanel();
+                    this.loadTab('users');
+                } else {
+                    document.getElementById('login-screen').style.display = 'block';
+                }
+                
+                this.bindEvents();
+            }
+            
+            bindEvents() {
+                // Login form
+                document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e));
+                
+                // Logout
+                document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+                
+                // Tab navigation
+                document.querySelectorAll('[data-tab]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.loadTab(e.target.dataset.tab);
+                    });
+                });
+                
+                // Create new button
+                document.getElementById('create-new-btn').addEventListener('click', () => {
+                    this.showCreateForm();
+                });
+            }
+            
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Échec de la connexion');
+                    }
+                    
+                    this.token = data.token;
+                    localStorage.setItem('adminToken', this.token);
+                    this.showAdminPanel();
+                    this.loadTab('users');
+                    
+                } catch (error) {
+                    const errorDiv = document.getElementById('login-error');
+                    errorDiv.textContent = error.message;
+                    errorDiv.classList.remove('hidden');
+                }
+            }
+            
+            logout() {
+                localStorage.removeItem('adminToken');
+                this.token = null;
+                document.getElementById('login-screen').style.display = 'block';
+                document.getElementById('admin-panel').classList.remove('active');
+            }
+            
+            showAdminPanel() {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').classList.add('active');
+            }
+            
+            async loadTab(tab) {
+                this.currentTab = tab;
+                const contentDiv = document.getElementById('admin-content');
+                
+                contentDiv.innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                        <p class="mt-2 text-muted">Chargement...</p>
+                    </div>
+                `;
+                
+                try {
+                    const response = await fetch(`/api/admin/${tab}`, {
+                        headers: { 'Authorization': `Bearer ${this.token}` }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Échec du chargement');
+                    }
+                    
+                    const data = await response.json();
+                    this.renderTable(tab, data);
+                    
+                } catch (error) {
+                    contentDiv.innerHTML = `<div class="alert alert-error">${error.message}</div>`;
+                }
+            }
+            
+            renderTable(tab, data) {
+                const contentDiv = document.getElementById('admin-content');
+                
+                if (!data || data.length === 0) {
+                    contentDiv.innerHTML = '<p class="text-center text-muted">Aucune donnée</p>';
+                    return;
+                }
+                
+                const columns = this.getColumnsForTable(tab);
+                const firstItem = data[0];
+                
+                let html = `
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    ${columns.map(col => `<th>${col.label}</th>`).join('')}
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.map(row => `
+                                    <tr>
+                                        ${columns.map(col => {
+                                            let value = row[col.key];
+                                            if (typeof value === 'object' && value !== null) {
+                                                value = JSON.stringify(value);
+                                            }
+                                            return `<td>${value || '-'}</td>`;
+                                        }).join('')}
+                                        <td>
+                                            <button class="btn btn-outline" style="padding: 6px 12px;" onclick="admin.editItem('${tab}', ${row.id})">✏️</button>
+                                            <button class="btn btn-outline" style="padding: 6px 12px; color: var(--error-red);" onclick="admin.deleteItem('${tab}', ${row.id})">🗑️</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = html;
+            }
+            
+            getColumnsForTable(tab) {
+                const configs = {
+                    users: [
+                        { key: 'id', label: 'ID' },
+                        { key: 'email', label: 'Email' },
+                        { key: 'role', label: 'Rôle' },
+                        { key: 'created_at', label: 'Créé le' }
+                    ],
+                    tournees: [
+                        { key: 'id', label: 'ID' },
+                        { key: 'region', label: 'Région' },
+                        { key: 'date_debut', label: 'Début' },
+                        { key: 'date_fin', label: 'Fin' },
+                        { key: 'stock_actuel', label: 'Stock Actuel' }
+                    ],
+                    pharmacies: [
+                        { key: 'id', label: 'ID' },
+                        { key: 'nom', label: 'Nom' },
+                        { key: 'type', label: 'Type' },
+                        { key: 'telephone', label: 'Téléphone' },
+                        { key: 'tournee_id', label: 'Tournée' }
+                    ],
+                    agents: [
+                        { key: 'id', label: 'ID' },
+                        { key: 'nom', label: 'Nom' },
+                        { key: 'email', label: 'Email' },
+                        { key: 'statut_jeu', label: 'Statut Jeu' },
+                        { key: 'pharmacy_id', label: 'Pharmacie' }
+                    ],
+                    questions: [
+                        { key: 'id', label: 'ID' },
+                        { key: 'difficulte', label: 'Difficulté' },
+                        { key: 'enonce', label: 'Énoncé' },
+                        { key: 'is_active', label: 'Actif' }
+                    ],
+                    bilans: [
+                        { key: 'id', label: 'ID' },
+                        { key: 'nom_pharmacie', label: 'Pharmacie' },
+                        { key: 'nom_agent', label: 'Agent' },
+                        { key: 'resultat', label: 'Résultat' },
+                        { key: 'created_at', label: 'Date' }
+                    ]
+                };
+                
+                return configs[tab] || [];
+            }
+            
+            showCreateForm() {
+                const modal = document.getElementById('form-modal');
+                const title = document.getElementById('form-title');
+                const body = document.getElementById('form-body');
+                
+                title.textContent = `Créer ${this.currentTab.slice(0, -1)}`;
+                
+                const fields = this.getFormFields(this.currentTab);
+                
+                body.innerHTML = `
+                    <form id="create-form">
+                        ${fields.map(field => `
+                            <div class="form-group">
+                                <label class="form-label">${field.label}</label>
+                                <${field.type === 'textarea' ? 'textarea' : 'input'} 
+                                    type="${field.type}" 
+                                    id="field-${field.key}" 
+                                    class="form-input"
+                                    ${field.required ? 'required' : ''}
+                                    ${field.placeholder ? `placeholder="${field.placeholder}"` : ''}>
+                                </${field.type === 'textarea' ? 'textarea' : 'input'}>
+                            </div>
+                        `).join('')}
+                    </form>
+                `;
+                
+                modal.classList.add('active');
+                
+                document.getElementById('form-submit').onclick = () => this.submitCreateForm(fields);
+            }
+            
+            getFormFields(tab) {
+                const configs = {
+                    users: [
+                        { key: 'email', label: 'Email', type: 'email', required: true },
+                        { key: 'password', label: 'Mot de passe', type: 'password', required: true },
+                        { key: 'role', label: 'Rôle', type: 'text', required: true, placeholder: 'admin/trainer/agent' }
+                    ],
+                    tournees: [
+                        { key: 'region', label: 'Région', type: 'text', required: true },
+                        { key: 'date_debut', label: 'Date début', type: 'date', required: true },
+                        { key: 'date_fin', label: 'Date fin', type: 'date', required: true },
+                        { key: 'stock_initial', label: 'Stock Initial (JSON)', type: 'textarea', required: true, placeholder: '{"type1": 50, "type2": 30}' }
+                    ],
+                    questions: [
+                        { key: 'difficulte', label: 'Difficulté', type: 'text', required: true, placeholder: '75%/50%/25%/1%' },
+                        { key: 'enonce', label: 'Énoncé', type: 'textarea', required: true },
+                        { key: 'blocs_corrects', label: 'Blocs Corrects (JSON array)', type: 'textarea', required: true },
+                        { key: 'blocs_pieges', label: 'Blocs Pièges (JSON array)', type: 'textarea', required: true }
+                    ]
+                };
+                
+                return configs[tab] || [];
+            }
+            
+            async submitCreateForm(fields) {
+                const formData = {};
+                fields.forEach(field => {
+                    const value = document.getElementById(`field-${field.key}`).value;
+                    formData[field.key] = value;
+                });
+                
+                try {
+                    const response = await fetch(`/api/${this.currentTab}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.token}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Échec de la création');
+                    }
+                    
+                    document.getElementById('form-modal').classList.remove('active');
+                    this.loadTab(this.currentTab);
+                    
+                } catch (error) {
+                    alert(error.message);
+                }
+            }
+            
+            async editItem(tab, id) {
+                alert(`Fonctionnalité d'édition à implémenter pour ${tab} ID: ${id}`);
+            }
+            
+            async deleteItem(tab, id) {
+                if (!confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/api/admin/${tab}/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${this.token}` }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Échec de la suppression');
+                    }
+                    
+                    this.loadTab(tab);
+                    
+                } catch (error) {
+                    alert(error.message);
+                }
+            }
+        }
+        
+        // Initialize admin dashboard
+        const admin = new AdminDashboard();
+        
+        // Expose for inline event handlers
+        window.admin = admin;
+    </script>
+</body>
+</html>

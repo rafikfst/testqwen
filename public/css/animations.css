@@ -1,0 +1,535 @@
+/* ============================================
+   AVÈNE GAME PLATFORM - ANIMATIONS
+   High-end Visual Effects Engine
+   ============================================ */
+
+/* --- THERMAL FLOAT ANIMATION ---
+   Gentle, water-like floating effect for word chips */
+@keyframes thermalFloat {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-8px) rotate(1deg);
+    }
+    50% {
+        transform: translateY(-4px) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-10px) rotate(-1deg);
+    }
+}
+
+.thermal-float {
+    animation: thermalFloat 3s ease-in-out infinite;
+    will-change: transform;
+}
+
+.thermal-float-delayed {
+    animation: thermalFloat 3s ease-in-out infinite;
+    animation-delay: 0.5s;
+    will-change: transform;
+}
+
+.thermal-float-fast {
+    animation: thermalFloat 2s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* --- CHIP POP ANIMATION ---
+   Springy scale-up animation when a word is clicked and placed */
+@keyframes chipPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    70% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.chip-pop {
+    animation: chipPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes chipPopReverse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.chip-pop-reverse {
+    animation: chipPopReverse 0.3s ease-in forwards;
+    will-change: transform, opacity;
+}
+
+/* --- WRONG ANSWER SHAKE ANIMATION ---
+   Horizontal head-shake with red glow for incorrect responses */
+@keyframes wrongAnswerShake {
+    0%, 100% {
+        transform: translateX(0);
+        box-shadow: 0 0 0 rgba(244, 67, 54, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-10px);
+        box-shadow: -5px 0 20px rgba(244, 67, 54, 0.4);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(10px);
+        box-shadow: 5px 0 20px rgba(244, 67, 54, 0.4);
+    }
+}
+
+.wrong-answer-shake {
+    animation: wrongAnswerShake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    will-change: transform, box-shadow;
+}
+
+/* --- SUCCESS BUBBLE ANIMATION ---
+   Beautiful translucent rising bubble effect (thermal water) upon winning */
+@keyframes successBubble {
+    0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1.2);
+        opacity: 0;
+    }
+}
+
+.success-bubble-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3000;
+    overflow: hidden;
+}
+
+.success-bubble {
+    position: absolute;
+    bottom: -100px;
+    background: radial-gradient(circle at 30% 30%, 
+        rgba(162, 210, 223, 0.8), 
+        rgba(162, 210, 223, 0.2), 
+        rgba(162, 210, 223, 0.1));
+    border-radius: 50%;
+    box-shadow: 
+        inset 0 0 20px rgba(255, 255, 255, 0.5),
+        0 0 20px rgba(162, 210, 223, 0.3);
+    animation: successBubble 4s ease-in infinite;
+    will-change: transform, opacity;
+}
+
+.success-bubble:nth-child(1) {
+    left: 10%;
+    width: 60px;
+    height: 60px;
+    animation-delay: 0s;
+    animation-duration: 4s;
+}
+
+.success-bubble:nth-child(2) {
+    left: 20%;
+    width: 80px;
+    height: 80px;
+    animation-delay: 0.5s;
+    animation-duration: 4.5s;
+}
+
+.success-bubble:nth-child(3) {
+    left: 35%;
+    width: 50px;
+    height: 50px;
+    animation-delay: 1s;
+    animation-duration: 3.5s;
+}
+
+.success-bubble:nth-child(4) {
+    left: 50%;
+    width: 90px;
+    height: 90px;
+    animation-delay: 1.5s;
+    animation-duration: 5s;
+}
+
+.success-bubble:nth-child(5) {
+    left: 65%;
+    width: 70px;
+    height: 70px;
+    animation-delay: 0.3s;
+    animation-duration: 4.2s;
+}
+
+.success-bubble:nth-child(6) {
+    left: 80%;
+    width: 60px;
+    height: 60px;
+    animation-delay: 0.8s;
+    animation-duration: 3.8s;
+}
+
+.success-bubble:nth-child(7) {
+    left: 90%;
+    width: 75px;
+    height: 75px;
+    animation-delay: 1.2s;
+    animation-duration: 4.3s;
+}
+
+/* --- BUTTON PULSE ANIMATION ---
+   Soft, glowing breathing effect on action buttons */
+@keyframes buttonPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 0 rgba(227, 122, 90, 0.4),
+            0 4px 20px rgba(44, 62, 80, 0.08);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 15px rgba(227, 122, 90, 0),
+            0 8px 30px rgba(44, 62, 80, 0.12);
+        transform: scale(1.02);
+    }
+}
+
+.button-pulse {
+    animation: buttonPulse 2s ease-in-out infinite;
+    will-change: box-shadow, transform;
+}
+
+.button-pulse-aqua {
+    animation: buttonPulseAqua 2s ease-in-out infinite;
+    will-change: box-shadow, transform;
+}
+
+@keyframes buttonPulseAqua {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 0 rgba(162, 210, 223, 0.4),
+            0 4px 20px rgba(44, 62, 80, 0.08);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 15px rgba(162, 210, 223, 0),
+            0 8px 30px rgba(44, 62, 80, 0.12);
+        transform: scale(1.02);
+    }
+}
+
+/* --- FADE IN ANIMATION --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.fade-in-delayed {
+    animation: fadeIn 0.6s ease-out 0.3s forwards;
+    opacity: 0;
+}
+
+/* --- SLIDE IN ANIMATIONS --- */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out forwards;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out forwards;
+}
+
+/* --- SCALE IN ANIMATION --- */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* --- ROTATE IN ANIMATION --- */
+@keyframes rotateIn {
+    from {
+        opacity: 0;
+        transform: rotate(-180deg) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: rotate(0) scale(1);
+    }
+}
+
+.rotate-in {
+    animation: rotateIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* --- BOUNCE ANIMATION --- */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+/* --- SPIN ANIMATION --- */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* --- PULSE GLOW ANIMATION --- */
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(227, 122, 90, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(227, 122, 90, 0.6);
+    }
+}
+
+.pulse-glow {
+    animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+/* --- RIPPLE EFFECT --- */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple-effect:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* --- CONFETTI ANIMATION --- */
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3000;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--avene-salmon);
+    animation: confettiFall 3s ease-in-out infinite;
+}
+
+.confetti:nth-child(odd) {
+    background: var(--aqua-thermal);
+}
+
+.confetti:nth-child(2n) {
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.confetti:nth-child(3n) {
+    left: 20%;
+    animation-delay: 0.5s;
+}
+
+.confetti:nth-child(4n) {
+    left: 30%;
+    animation-delay: 1s;
+}
+
+.confetti:nth-child(5n) {
+    left: 40%;
+    animation-delay: 1.5s;
+}
+
+.confetti:nth-child(6n) {
+    left: 50%;
+    animation-delay: 0.3s;
+}
+
+.confetti:nth-child(7n) {
+    left: 60%;
+    animation-delay: 0.8s;
+}
+
+.confetti:nth-child(8n) {
+    left: 70%;
+    animation-delay: 1.2s;
+}
+
+.confetti:nth-child(9n) {
+    left: 80%;
+    animation-delay: 0.6s;
+}
+
+.confetti:nth-child(10n) {
+    left: 90%;
+    animation-delay: 1.1s;
+}
+
+/* --- WATER WAVE ANIMATION --- */
+@keyframes waterWave {
+    0% {
+        transform: translateX(0) translateY(0);
+    }
+    25% {
+        transform: translateX(-25%) translateY(5px);
+    }
+    50% {
+        transform: translateX(-50%) translateY(0);
+    }
+    75% {
+        transform: translateX(-25%) translateY(-5px);
+    }
+    100% {
+        transform: translateX(0) translateY(0);
+    }
+}
+
+.water-wave {
+    animation: waterWave 3s ease-in-out infinite;
+}
+
+/* --- UTILITY CLASSES FOR ANIMATIONS --- */
+.animation-delay-1 { animation-delay: 0.1s; }
+.animation-delay-2 { animation-delay: 0.2s; }
+.animation-delay-3 { animation-delay: 0.3s; }
+.animation-delay-4 { animation-delay: 0.4s; }
+.animation-delay-5 { animation-delay: 0.5s; }
+
+.animation-duration-fast { animation-duration: 0.3s; }
+.animation-duration-normal { animation-duration: 0.5s; }
+.animation-duration-slow { animation-duration: 1s; }
+
+.animation-infinite { animation-iteration-count: infinite; }
+.animation-once { animation-iteration-count: 1; }
+
+.animation-forwards { animation-fill-mode: forwards; }
+.animation-backwards { animation-fill-mode: backwards; }
+.animation-both { animation-fill-mode: both; }
+
+/* --- RESPONSIVE ANIMATIONS --- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

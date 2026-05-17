@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - Avène Game Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar no-print">
+        <div class="container flex-between">
+            <div class="navbar-brand">🌊 Avène Game</div>
+            <div class="navbar-menu">
+                <a href="/" class="navbar-link">Accueil</a>
+                <a href="/game.html" class="navbar-link">Jeu</a>
+                <a href="/reporting.html" class="navbar-link">Rapports</a>
+                <a href="/admin.html" class="navbar-link">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <div id="reporting-container"></div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="/js/reporting.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reporting = new AveneReporting({
+                apiBaseUrl: '/api',
+                supabaseKey: 'sb_publishable_vltwOvN6j1ThYSos43EV9A_z7la0IFh'
+            });
+            
+            reporting.init('reporting-container').catch(err => {
+                console.error('Failed to initialize reporting:', err);
+            });
+        });
+    </script>
+</body>
+</html>

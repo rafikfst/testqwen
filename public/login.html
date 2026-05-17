@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Avène Game Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    
+    <style>
+        .auth-page {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth-container {
+            max-width: 450px;
+            width: 100%;
+            padding: 2rem;
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--pristine-white);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar no-print">
+        <div class="container flex-between">
+            <div class="navbar-brand">🌊 Avène Game</div>
+            <div class="navbar-menu">
+                <a href="/" class="navbar-link">Accueil</a>
+                <a href="/game.html" class="navbar-link">Jeu</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Page -->
+    <main class="auth-page">
+        <div class="container">
+            <div class="auth-container card fade-in">
+                <h2 id="auth-title" class="text-center mb-4">Connexion</h2>
+                
+                <form id="auth-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="auth-email" class="form-input" required placeholder="votre@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" id="auth-password" class="form-input" required placeholder="••••••••">
+                    </div>
+                    
+                    <div id="register-fields" class="hidden">
+                        <div class="form-group">
+                            <label class="form-label">Rôle</label>
+                            <select id="auth-role" class="form-select">
+                                <option value="trainer">Formateur</option>
+                                <option value="agent">Agent</option>
+                                <option value="admin">Administrateur</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="auth-submit" class="btn btn-primary w-100">Se connecter</button>
+                </form>
+                
+                <div id="auth-error" class="alert alert-error mt-3 hidden"></div>
+                <div id="auth-success" class="alert alert-success mt-3 hidden"></div>
+                
+                <div class="auth-toggle">
+                    <p class="text-muted">
+                        <span id="toggle-text">Pas encore de compte ?</span>
+                        <button id="toggle-auth" class="btn btn-outline" style="padding: 8px 16px;">S'inscrire</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        class AuthManager {
+            constructor() {
+                this.isLogin = true;
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+            }
+            
+            bindEvents() {
+                document.getElementById('auth-form').addEventListener('submit', (e) => this.handleSubmit(e));
+                document.getElementById('toggle-auth').addEventListener('click', () => this.toggleMode());
+            }
+            
+            toggleMode() {
+                this.isLogin = !this.isLogin;
+                
+                const title = document.getElementById('auth-title');
+                const submit = document.getElementById('auth-submit');
+                const toggleText = document.getElementById('toggle-text');
+                const toggleBtn = document.getElementById('toggle-auth');
+                const registerFields = document.getElementById('register-fields');
+                
+                if (this.isLogin) {
+                    title.textContent = 'Connexion';
+                    submit.textContent = 'Se connecter';
+                    toggleText.textContent = 'Pas encore de compte ?';
+                    toggleBtn.textContent = 'S\'inscrire';
+                    registerFields.classList.add('hidden');
+                } else {
+                    title.textContent = 'Inscription';
+                    submit.textContent = 'S\'inscrire';
+                    toggleText.textContent = 'Déjà un compte ?';
+                    toggleBtn.textContent = 'Se connecter';
+                    registerFields.classList.remove('hidden');
+                }
+                
+                this.clearMessages();
+            }
+            
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('auth-email').value;
+                const password = document.getElementById('auth-password').value;
+                const role = document.getElementById('auth-role').value;
+                
+                this.clearMessages();
+                
+                try {
+                    const endpoint = this.isLogin ? '/api/auth/login' : '/api/auth/register';
+                    const body = this.isLogin 
+                        ? { email, password }
+                        : { email, password, role };
+                    
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Une erreur est survenue');
+                    }
+                    
+                    if (this.isLogin) {
+                        // Store token and redirect
+                        localStorage.setItem('userToken', data.token);
+                        localStorage.setItem('userInfo', JSON.stringify(data.user));
+                        
+                        this.showSuccess('Connexion réussie ! Redirection...');
+                        
+                        setTimeout(() => {
+                            if (data.user.role === 'admin') {
+                                window.location.href = '/admin.html';
+                            } else {
+                                window.location.href = '/game.html';
+                            }
+                        }, 1500);
+                    } else {
+                        this.showSuccess('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+                        setTimeout(() => {
+                            this.toggleMode();
+                        }, 2000);
+                    }
+                    
+                } catch (error) {
+                    this.showError(error.message);
+                }
+            }
+            
+            showError(message) {
+                const errorDiv = document.getElementById('auth-error');
+                errorDiv.textContent = message;
+                errorDiv.classList.remove('hidden');
+            }
+            
+            showSuccess(message) {
+                const successDiv = document.getElementById('auth-success');
+                successDiv.textContent = message;
+                successDiv.classList.remove('hidden');
+            }
+            
+            clearMessages() {
+                document.getElementById('auth-error').classList.add('hidden');
+                document.getElementById('auth-success').classList.add('hidden');
+            }
+        }
+        
+        // Initialize auth manager
+        new AuthManager();
+    </script>
+</body>
+</html>
