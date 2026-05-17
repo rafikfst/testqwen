@@ -1,21 +1,5 @@
 ```
-# Dependencies
-node_modules/
-
-# Environment variables
-.env
-
 # Logs
 *.log
-
-# Build artifacts (from the long list of node_modules files)
-dist/
-build/
-target/
-
-# Package lock file
-package-lock.json
-
-# Database schema (since it's generated/modified by the system)
-schema.sql
+server.log
 ```

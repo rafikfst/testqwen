@@ -788,8 +788,8 @@ app.delete('/api/admin/:table/:id', authMiddleware, adminMiddleware, async (req,
 // SERVE FRONTEND
 // ============================================
 
-// Serve index.html for all other routes (SPA support) - Express 5 compatible
-app.get('/{*path}', (req, res) => {
+// Serve index.html for all other routes (SPA support) - Express 4 compatible
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
